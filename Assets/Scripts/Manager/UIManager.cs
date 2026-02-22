@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,10 +16,17 @@ public class UIManager : MonoBehaviour
     [Header("Screens")]
     [SerializeField] private GameObject HUDobject;
     [SerializeField] private GameObject pauseScreen;
-    [SerializeField] private GameObject victoryScreen;
-    [SerializeField] private TextMeshProUGUI victoryMessageText;
+    //[SerializeField] private GameObject victoryScreen;
+    //[SerializeField] private TextMeshProUGUI victoryMessageText;
     [SerializeField] private GameObject gameoverScreen;
     [SerializeField] private TextMeshProUGUI gameoverMessageText;
+    [SerializeField] private GameObject resultScreen;
+    [SerializeField] private TextMeshProUGUI resultTitleText;
+    [SerializeField] private TextMeshProUGUI animalNameText;
+    [SerializeField] private GameObject characteristcsGroup;
+    [SerializeField] private TextMeshProUGUI number1Text; //Size
+    [SerializeField] private TextMeshProUGUI number2Text; //Temperament
+    [SerializeField] private TextMeshProUGUI snakeText;
 
     [Header("Feedback UI")]
     [SerializeField] private GameObject actionButtonsGroup;
@@ -40,6 +48,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] private CanvasGroup fadeCanvasGroup;
     [SerializeField] private GameObject mainCamera;
     [SerializeField] private GameObject revelationCamera;
+    [SerializeField] private GameObject redImage;
     [SerializeField] private float fadeDuration;
 
     void Awake()
@@ -76,7 +85,7 @@ public class UIManager : MonoBehaviour
     void HandleStateChange(GameState newState)
     {
         pauseScreen.SetActive(false);
-        victoryScreen.SetActive(false);
+        resultScreen.SetActive(false);
         gameoverScreen.SetActive(false);
 
         if (newState == GameState.Paused) pauseScreen.SetActive(true);
@@ -196,25 +205,37 @@ public class UIManager : MonoBehaviour
                 {
                     Animator snakeAnim = animalObject.GetComponent<Animator>();
 
-                    if (snakeAnim != null) snakeAnim.SetTrigger("Attack");
+                    if (snakeAnim != null) snakeAnim.SetTrigger("Attack");;
                 }
             }
             else
             {
                 //You lost, but it was a dog (characteristics didn't match)
-                yield return new WaitForSeconds(5f);
+                yield return new WaitForSeconds(0.5f);
             }
         }
         // ------------------------
 
+        //SFX
+        if (RoundManager.Instance.CurrentAnimal is SnakeData) AudioManager.Instance.PlaySFX(AudioManager.Instance.snakeHissing);
+
         //Dramatic pause while the screen is black
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
 
         yield return StartCoroutine(FadeRoutine(0f));
-
-        yield return new WaitForSeconds(5f);
+        if (RoundManager.Instance.CurrentAnimal is SnakeData && GameManager.Instance.CurrentState == GameState.GameOver)
+        {
+            yield return new WaitForSeconds(0.1f);
+            redImage.SetActive(true);
+        }
 
         ShowFinalResultScreen();
+
+        //SFX
+        if (RoundManager.Instance.CurrentAnimal is SnakeData && GameManager.Instance.CurrentState == GameState.GameOver) AudioManager.Instance.PlaySFX(AudioManager.Instance.pianoJumpScare);
+
+        if (RoundManager.Instance.CurrentAnimal is SnakeData) yield return new WaitForSeconds(2f);
+        else yield return new WaitForSeconds(5f);     
     }
 
     IEnumerator FadeRoutine(float targetAlpha)
@@ -240,18 +261,38 @@ public class UIManager : MonoBehaviour
 
     void ShowFinalResultScreen()
     {
+        resultScreen.SetActive(true);
         GameState currentState = GameManager.Instance.CurrentState;
-        GuessManager guessManager = FindAnyObjectByType<GuessManager>();
+        AnimalData currentAnimal = RoundManager.Instance.CurrentAnimal;
 
         if (currentState == GameState.Victory)
         {
-            victoryScreen.SetActive(true);
-            victoryMessageText.text = guessManager.FinalMessage;
+            resultTitleText.text = "Você acertou!";
+            resultTitleText.color = Color.green;
         }
         else if (currentState == GameState.GameOver)
         {
-            gameoverScreen.SetActive(true);
-            gameoverMessageText.text = guessManager.FinalMessage;
+            resultTitleText.text = "Você errou!";
+            resultTitleText.color = Color.red;
+        }
+
+        animalNameText.text = currentAnimal.name;   
+
+        if (currentAnimal is DogData dog)
+        {
+            characteristcsGroup.SetActive(true);
+
+            if (dog.Size == Size.Small) number1Text.text = "Pequeno";
+            else number1Text.text = "Grande";
+
+            if (dog.Temperament == Temperament.Docile) number2Text.text = "Dócil";
+            else if (dog.Temperament == Temperament.Restless) number2Text.text = "Agitado";
+            else number2Text.text = "Agressivo";    
+        }
+        else if (currentAnimal is SnakeData)
+        {
+            characteristcsGroup.SetActive(false);
+            snakeText.text = "Escapou por pouco...";
         }
     }
 

@@ -17,8 +17,6 @@ public class GuessManager : MonoBehaviour
     [Header("Feedback")]
     [SerializeField] private TextMeshProUGUI resultText;
 
-    public string FinalMessage {  get; private set; }
-
     void Start()
     {
         clipboardPanel.SetActive(false);
@@ -65,20 +63,14 @@ public class GuessManager : MonoBehaviour
 
         if (currentAnimal is SnakeData)
         {
-            if (!guessedDog)
-            {
-                WinGame("Você acertou! Era uma Cobra, que perigo!");
-            }
-            else
-            {
-                LoseGame("Você errou... Era uma Cobra! Pelo menos não foi picado");
-            }
+            if (!guessedDog) WinGame();
+            else LoseGame();
         }
         else if (currentAnimal is DogData dog)
         {
             if (!guessedDog)
             {
-                LoseGame("Você errou! Era um cachorro, não uma cobra");
+                LoseGame();
                 return;
             }
 
@@ -91,47 +83,21 @@ public class GuessManager : MonoBehaviour
             //Temperament: 0 = Docile, 1 = Restless, 2 = Agressive
             Temperament guessedTemp = (Temperament)temperamentDropdown.value;
 
-            if (dog.Size == guessedSize && dog.Temperament == guessedTemp)
-            {
-                string dogResult = GetDogResult(guessedSize, guessedTemp);
-                WinGame($"Você acertou! Era um {dogResult}"!);
-            }
-            else
-            {
-                LoseGame($"Você errou as características...");
-            }
+            if (dog.Size == guessedSize && dog.Temperament == guessedTemp) WinGame();
+            else LoseGame();
         }
 
         UIManager.Instance.StartRevelationTransition();
     }
 
-    string GetDogResult(Size size, Temperament temp)
+    void WinGame()
     {
-        if (size == Size.Small)
-        {
-            if (temp == Temperament.Docile) return "Salsicha";
-            if (temp == Temperament.Restless) return "Lulu-da-Pomerânia";
-            if (temp == Temperament.Agressive) return "Pinscher";
-        }
-        else if (size == Size.Big)
-        {
-            if (temp == Temperament.Docile) return "São Bernardo";
-            if (temp == Temperament.Restless) return "Golden";
-            if (temp == Temperament.Agressive) return "Rottweiler";
-        }
-        return "Cachorro desconhecido";
-    }
-
-    void WinGame(string message)
-    {
-        FinalMessage = message;
         CloseClipboard();
         GameManager.Instance.SetVictory();
     }
 
-    void LoseGame(string message)
+    void LoseGame()
     {
-        FinalMessage = message;
         CloseClipboard();
         GameManager.Instance.SetGameOver();
     }

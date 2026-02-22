@@ -326,6 +326,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2411824439090259078}
+  - component: {fileID: 1721509173737619593}
   m_Layer: 0
   m_Name: Husky
   m_TagString: Untagged
@@ -350,6 +351,19 @@ Transform:
   - {fileID: 8353561334446729367}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1721509173737619593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 944623541150638212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e7c9423c1d7c59748b3f6d0759ffd85a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DogRotation
+  rotationSpeed: 20
 --- !u!1 &1081750212474053269
 GameObject:
   m_ObjectHideFlags: 0
