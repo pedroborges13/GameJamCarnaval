@@ -29,6 +29,8 @@ public class GuessManager : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.Instance.CurrentState == GameState.Victory || GameManager.Instance.CurrentState == GameState.GameOver) return;
+
         if (Input.GetKeyDown(KeyCode.Tab))
         {
             ToggleClipboard();

@@ -150,7 +150,12 @@ public class UIManager : MonoBehaviour
 
         GameObject textInstance = Instantiate(floatingTextPrefab, mainCanvasTransform);
 
-        textInstance.transform.position = new Vector3(targetTransform.position.x, targetTransform.position.y - 100f, targetTransform.position.z - 1f); 
+        textInstance.transform.localScale = Vector3.one;
+
+        textInstance.transform.position = targetTransform.position;
+
+        Vector3 lp = textInstance.transform.localPosition;
+        textInstance.transform.localPosition = new Vector3(lp.x, lp.y - 125f, 0f);
 
         textInstance.GetComponent<FloatingText>().Setup(message, color);
     }
